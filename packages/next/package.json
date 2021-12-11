@@ -1,5 +1,5 @@
 {
-  "name": "@my-app/next",
+  "name": "@deskjockeyfitness/next",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@my-app/app": "*",
+    "@deskjockeyfitness/app": "*",
     "@react-native-async-storage/async-storage": "^1.15.8",
     "next": "11.1.2",
     "next-fonts": "^1.5.1",

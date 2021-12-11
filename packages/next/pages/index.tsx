@@ -2,6 +2,6 @@
 // which Next.js doesn't polyfill by default.
 import 'setimmediate';
 
-import { App } from '@my-app/app';
+import { App } from '@deskjockeyfitness/app';
 
 export default App;

@@ -1,5 +1,5 @@
 {
-  "name": "@my-app/tv",
+  "name": "@deskjockeyfitness/tv",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -13,7 +13,7 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
-    "@my-app/app": "*",
+    "@deskjockeyfitness/app": "*",
     "@react-native-async-storage/async-storage": "^1.15.7",
     "react": "17.0.1",
     "react-native": "npm:react-native-tvos@0.64.2-2"

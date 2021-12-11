@@ -1,7 +1,7 @@
 require_relative '../node_modules/react-native-macos/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-target 'reactnativeuniversalproject-macOS' do
+target 'deskjockeyfitness-macOS' do
   platform :macos, '10.14'
   use_native_modules!
   use_react_native!(
@@ -17,7 +17,7 @@ target 'reactnativeuniversalproject-macOS' do
   # Pods specifically for macOS target
 end
 
-target 'reactnativeuniversalproject-iOS' do
+target 'deskjockeyfitness-iOS' do
   platform :ios, '10'
   use_native_modules!
   use_react_native!(:path => '../node_modules/react-native-macos')

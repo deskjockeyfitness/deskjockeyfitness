@@ -1,5 +1,5 @@
 {
-  "name": "@my-app/electron",
+  "name": "@deskjockeyfitness/electron",
   "version": "0.0.0",
   "private": true,
   "author": "John Doe",
@@ -19,7 +19,7 @@
     "lint:fix": "yarn lint --fix"
   },
   "dependencies": {
-    "@my-app/app": "*",
+    "@deskjockeyfitness/app": "*",
     "@react-native-async-storage/async-storage": "^1.15.7",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
