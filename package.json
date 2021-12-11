@@ -20,7 +20,6 @@
   },
   "scripts": {
     "reset": "find . -type dir -name node_modules | xargs rm -rf && rm -rf yarn.lock",
-    "pods": "yarn ios:pods && yarn tv:tvos:pods && yarn macos:pods",
     "android:metro": "yarn workspace @deskjockeyfitness/mobile start",
     "android:start": "yarn workspace @deskjockeyfitness/mobile android",
     "android:studio": "yarn workspace @deskjockeyfitness/mobile studio",
@@ -52,10 +51,11 @@
     "browser-ext:build": "yarn workspace @deskjockeyfitness/browser-ext build",
     "windows:metro": "yarn workspace @deskjockeyfitness/windows start",
     "windows:start": "yarn workspace @deskjockeyfitness/windows windows",
-    "lint": "ultra -r lint",
-    "lint:fix": "ultra -r lint:fix",
-    "test": "ultra -r test",
-    "typecheck": "ultra -r typecheck"
+    "pods": "lerna run pods --stream",
+    "lint": "lerna run lint --stream",
+    "lint:fix": "lerna run lint:fix --stream",
+    "test": "lerna run test --stream",
+    "typecheck": "lerna run typecheck --stream"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.29.3",
@@ -64,8 +64,8 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-react-app": "^6.2.2",
     "eslint-plugin-react-native": "^3.11.0",
+    "lerna": "^4.0.0",
     "prettier": "^2.3.2",
-    "typescript": "^4.4.2",
-    "ultra-runner": "^3.10.5"
+    "typescript": "^4.4.2"
   }
 }
