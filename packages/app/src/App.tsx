@@ -1,69 +1,96 @@
-import React from "react";
+import React, { useEffect, useState } from "react"
 import {
-  Image,
-  ImageSourcePropType,
+  Button,
   Platform,
   SafeAreaView,
-  StyleSheet,
-  Text,
   View,
-} from "react-native";
-import { AsyncStorageExample } from "./AsyncStorageExample";
-import { subplatform } from "./config";
-import LogoSrc from "./logo.png";
+} from "react-native"
+import { UserContextProvider, useUser } from './components/UserContext'
+import Auth from './components/Auth'
+import ExerciseFeed from './components/ExerciseFeed'
+import { subPlatform } from "./config"
+import { supabase } from './lib/initSupabase'
 
-export function App(): JSX.Element {
-  const platformValue = subplatform
-    ? `${Platform.OS} (${subplatform})`
-    : Platform.OS;
-  return (
-    <SafeAreaView style={styles.root}>
-      {/* On React Native for Web builds coming from CRA, TypeScript 
-          complains about the image type, so we cast it as a workaround  */}
-      <Image style={styles.logo} source={LogoSrc as ImageSourcePropType} />
-      <Text style={styles.text}>Hello from React Native!</Text>
-      <View style={styles.platformRow}>
-        <Text style={styles.text}>Platform: </Text>
-        <View style={styles.platformBackground}>
-          <Text style={styles.platformValue}>{platformValue}</Text>
-        </View>
-      </View>
-      <AsyncStorageExample/>
-    </SafeAreaView>
-  );
+const Container = () => {
+  const { user } = useUser()
+
+  return user ? (
+    <View>
+      <Button title="Sign out" onPress={() => supabase.auth.signOut()} />
+    </View>
+  ) : (
+    <Auth />
+  )
 }
 
-const styles = StyleSheet.create({
-  root: {
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "white",
-  },
-  logo: {
-    width: 120,
-    height: 120,
-    marginBottom: 20,
-  },
-  text: {
-    fontSize: 28,
-    fontWeight: "600",
-  },
-  platformRow: {
-    marginTop: 12,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  platformValue: {
-    fontSize: 28,
-    fontWeight: "500",
-  },
-  platformBackground: {
-    backgroundColor: "#ececec",
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#d4d4d4",
-    paddingHorizontal: 6,
-    borderRadius: 6,
-    alignItems: "center",
+export function App(): JSX.Element {
+  const [timeRemaining, setTimeRemaining] = useState<number>()
+  const [secondsLeft, setSecondsLeft] = useState<number | undefined>(60)
+  const [greenOpacity, setGreenOpacity] = useState<number>()
+  const [redOpacity, setRedOpacity] = useState<number>()
+
+  const platformValue = subPlatform
+    ? `${Platform.OS} (${subPlatform})`
+    : Platform.OS
+
+  console.log(platformValue)
+
+  useEffect(() => {
+    if (!timeRemaining) {
+      setTimesAndColors()
+    } else {
+      setTimeout(function () {
+        setSecondsLeft(undefined)
+        setTimesAndColors()
+      }, secondsLeft || 60000)
+    }
+  }, [timeRemaining])
+
+  function setTimesAndColors() {
+    const date = new Date()
+    const minute = date.getMinutes()
+    const seconds = date.getSeconds()
+
+    if (seconds) {
+      setSecondsLeft((60 - seconds) * 1000)
+    }
+
+    setTimeRemaining(60 - minute)
+
+    const opacityTime = (60 - minute) / 60
+
+    setGreenOpacity(0 +  opacityTime)
+    setRedOpacity(1 - opacityTime)
   }
-});
+
+  return (
+    <UserContextProvider>
+      <SafeAreaView
+        style={{
+          backgroundColor: 'white',
+          height: "100%",
+        }}
+      >
+        <SafeAreaView
+          style={{
+            backgroundColor: `rgba(239, 68, 68, ${redOpacity})`,
+            height: "100%",
+          }}
+        >
+          <SafeAreaView
+            style={{
+              backgroundColor: `rgba(34, 197, 94, ${greenOpacity})`,
+              height: "100%",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 15,
+            }}
+          >
+            {/* <Container /> */}
+            <ExerciseFeed />
+          </SafeAreaView>
+        </SafeAreaView>
+      </SafeAreaView>
+    </UserContextProvider>
+  )
+}
