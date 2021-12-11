@@ -20,6 +20,8 @@
   },
   "scripts": {
     "reset": "find . -type dir -name node_modules | xargs rm -rf && rm -rf yarn.lock",
+    "bootstrap": "lerna bootstrap",
+    "postinstall": "yarn bootstrap",
     "android:metro": "yarn workspace @deskjockeyfitness/mobile start",
     "android:start": "yarn workspace @deskjockeyfitness/mobile android",
     "android:studio": "yarn workspace @deskjockeyfitness/mobile studio",
