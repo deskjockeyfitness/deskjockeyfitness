@@ -2,8 +2,8 @@
   "name": "@deskjockeyfitness/electron",
   "version": "0.0.0",
   "private": true,
-  "author": "John Doe",
-  "description": "My fantastic Electron app",
+  "author": "Desk Jockey Fitness",
+  "description": "Quick hourly workouts to get you away from the desk.",
   "main": "./public/electron.js",
   "homepage": "./",
   "scripts": {
