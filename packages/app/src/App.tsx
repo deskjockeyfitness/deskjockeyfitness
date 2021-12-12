@@ -81,9 +81,6 @@ export function App(): JSX.Element {
             style={{
               backgroundColor: `rgba(34, 197, 94, ${greenOpacity})`,
               height: "100%",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: 15,
             }}
           >
             {/* <Container /> */}

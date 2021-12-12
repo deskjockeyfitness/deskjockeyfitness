@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text } from 'react-native'
+import { View, Text, Button, SafeAreaView } from 'react-native'
+import { useAsyncStorage } from '@react-native-async-storage/async-storage'
 import { supabase } from '../lib/initSupabase'
-import { generateExercise } from '../utils/generateExercise'
+import { generateExercise, dateTotal } from '../utils/generateExercise'
 import {
   Exercise,
   ExerciseData,
@@ -9,7 +10,22 @@ import {
 
 export default function ExerciseFeed(): JSX.Element {
   const [allExercises, setAllExercises] = useState<Array<Exercise>>()
-  const [picked, setPicked] = useState<ExerciseData | undefined>()
+  const [picked, setPicked] = useState<ExerciseData>()
+  const [completeValue, setCompleteValue] = useState<string>('')
+
+  const { getItem, setItem } = useAsyncStorage('@deskjockeyfitness/complete')
+
+  const readItemFromStorage = async () => {
+    const item = await getItem();
+    setCompleteValue(item || '')
+  };
+
+  const writeItemToStorage = async (newValue: string) => {
+    await setItem(newValue);
+    setCompleteValue(newValue)
+  };
+
+  const currentTime = dateTotal()
 
   const fetchExercises = async () => {
     const { data: exercises, error } = await supabase
@@ -23,6 +39,7 @@ export default function ExerciseFeed(): JSX.Element {
   }
 
   useEffect(() => {
+    readItemFromStorage()
     fetchExercises()
   }, [])
 
@@ -33,67 +50,104 @@ export default function ExerciseFeed(): JSX.Element {
     }
   }, [allExercises])
 
+  const completedJson = completeValue ? JSON.parse(completeValue) : null
+
+  const onClick = () => {
+    if (completedJson && completedJson.time === currentTime) {
+      writeItemToStorage('')
+    }
+
+    if (!completeValue) {
+      writeItemToStorage(JSON.stringify({
+        time: currentTime,
+        completed: true,
+      }))
+    }
+
+    if (completedJson && completedJson.time !== currentTime) {
+      writeItemToStorage(JSON.stringify({
+        time: currentTime,
+        completed: true,
+      }))
+    }
+  }
+
   return (
-    <View>
-      {picked && (
-        <>
-          <View>
-            <Text
-              style={{
-                color: '#0f172a',
-                fontSize: 95,
-                fontWeight: 'bold',
-                textAlign: 'center',
-              }}
-            >
-              {picked.reps}
-            </Text>
-          </View>
-          {picked.exercise.seconds && (
+    <SafeAreaView
+      style={{
+        backgroundColor: completedJson && completedJson.time === currentTime ? '#3b82f6' : 'transparent',
+        height: "100%",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 15,
+      }}
+    >
+      <View>
+        {picked && (
+          <>
             <View>
               <Text
                 style={{
                   color: '#0f172a',
-                  fontSize: 15,
-                  fontWeight: '500',
-                  marginBottom: 10,
-                  marginTop: -10,
-                  textAlign: 'center'
+                  fontSize: 95,
+                  fontWeight: 'bold',
+                  textAlign: 'center',
                 }}
               >
-                {'second'}
+                {picked.reps}
               </Text>
             </View>
-          )}
-          <View>
-            <Text
-              style={{
-                color: '#0f172a',
-                fontSize: 30,
-                fontWeight: '700',
-                textAlign: 'center'
-              }}
-            >
-              {picked.exercise.name}
-            </Text>
-          </View>
-          {picked.exercise.each && (
+            {picked.exercise.seconds && (
+              <View>
+                <Text
+                  style={{
+                    color: '#0f172a',
+                    fontSize: 15,
+                    fontWeight: '500',
+                    marginBottom: 10,
+                    marginTop: -10,
+                    textAlign: 'center'
+                  }}
+                >
+                  {'second'}
+                </Text>
+              </View>
+            )}
             <View>
               <Text
                 style={{
                   color: '#0f172a',
-                  fontSize: 15,
-                  fontWeight: '500',
-                  marginTop: 10,
+                  fontSize: 30,
+                  fontWeight: '700',
+                  marginBottom: 20,
                   textAlign: 'center'
                 }}
               >
-                {'(each side)'}
+                {picked.exercise.name}
               </Text>
             </View>
-          )}
-        </>
-      )}
-    </View>
+            {picked.exercise.each && (
+              <View>
+                <Text
+                  style={{
+                    color: '#0f172a',
+                    fontSize: 15,
+                    fontWeight: '500',
+                    marginBottom: 20,
+                    textAlign: 'center'
+                  }}
+                >
+                  {'(each side)'}
+                </Text>
+              </View>
+            )}
+            <Button
+              title={completedJson && completedJson.time === currentTime ? 'Not complete' : 'Complete'}
+              onPress={onClick}
+            />
+          </>
+        )}
+      </View>
+    </SafeAreaView>
   )
 }

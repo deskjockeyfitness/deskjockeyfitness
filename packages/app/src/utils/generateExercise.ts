@@ -33,7 +33,7 @@ export function generateExercise(exercises: Exercise[], date: CompareDate = unde
   }
 }
 
-function dateTotal(givenDate: CompareDate = undefined): number {
+export function dateTotal(givenDate: CompareDate = undefined): number {
   const date = givenDate ? new Date(givenDate) : new Date()
   const year = date.getFullYear()
   const month = date.getMonth()
