@@ -84,7 +84,7 @@ export function App(): JSX.Element {
             }}
           >
             {/* <Container /> */}
-            <ExerciseFeed />
+            <ExerciseFeed timeRemaining={timeRemaining} />
           </SafeAreaView>
         </SafeAreaView>
       </SafeAreaView>

@@ -8,7 +8,7 @@ import {
   ExerciseData,
 } from '../types'
 
-export default function ExerciseFeed(): JSX.Element {
+export default function ExerciseFeed({ timeRemaining } : { timeRemaining: number | undefined }): JSX.Element {
   const [allExercises, setAllExercises] = useState<Array<Exercise>>()
   const [picked, setPicked] = useState<ExerciseData>()
   const [completeValue, setCompleteValue] = useState<string>('')
@@ -42,6 +42,12 @@ export default function ExerciseFeed(): JSX.Element {
     readItemFromStorage()
     fetchExercises()
   }, [])
+
+  useEffect(() => {
+    if (timeRemaining === 60) {
+      fetchExercises()
+    }
+  }, [timeRemaining])
 
   useEffect(() => {
     if (allExercises?.length) {
@@ -141,10 +147,10 @@ export default function ExerciseFeed(): JSX.Element {
                 </Text>
               </View>
             )}
-            <Button
+            {/* <Button
               title={completedJson && completedJson.time === currentTime ? 'Not complete' : 'Complete'}
               onPress={onClick}
-            />
+            /> */}
           </>
         )}
       </View>
