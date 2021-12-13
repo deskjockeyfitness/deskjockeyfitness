@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Alert, StyleSheet, View, Button, TextInput } from 'react-native'
+import { Alert, View, Button, TextInput } from 'react-native'
 import { supabase } from '../lib/initSupabase'
 
 export default function Auth() {

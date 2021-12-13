@@ -39,7 +39,7 @@ export function dateTotal(givenDate: CompareDate = undefined): number {
   const month = date.getMonth()
   const day = date.getDay()
   const hour = date.getHours()
-  return year + month + day + hour
+  return year * month * day * hour
 }
 
 function removeNewerExercises(exercises: Exercise[], date: CompareDate = undefined): Exercise[] {

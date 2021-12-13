@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import { View, Text, Button, SafeAreaView } from 'react-native'
-import { useAsyncStorage } from '@react-native-async-storage/async-storage'
+import React, { useEffect, useState, useContext } from 'react'
+import { View, Text, SafeAreaView } from 'react-native'
 import { supabase } from '../lib/initSupabase'
-import { generateExercise, dateTotal } from '../utils/generateExercise'
+import { generateExercise } from '../utils/generateExercise'
+import { CompletedContext } from './CompletedContext'
+import Timer from './Timer'
+import CompleteButton from './CompleteButton'
 import {
   Exercise,
   ExerciseData,
@@ -11,21 +13,9 @@ import {
 export default function ExerciseFeed({ timeRemaining } : { timeRemaining: number | undefined }): JSX.Element {
   const [allExercises, setAllExercises] = useState<Array<Exercise>>()
   const [picked, setPicked] = useState<ExerciseData>()
-  const [completeValue, setCompleteValue] = useState<string>('')
+  const [timerDone, setTimerDone] = useState(false)
 
-  const { getItem, setItem } = useAsyncStorage('@deskjockeyfitness/complete')
-
-  const readItemFromStorage = async () => {
-    const item = await getItem();
-    setCompleteValue(item || '')
-  };
-
-  const writeItemToStorage = async (newValue: string) => {
-    await setItem(newValue);
-    setCompleteValue(newValue)
-  };
-
-  const currentTime = dateTotal()
+  const { completed, setCompleted } = useContext(CompletedContext)
 
   const fetchExercises = async () => {
     const { data: exercises, error } = await supabase
@@ -39,7 +29,6 @@ export default function ExerciseFeed({ timeRemaining } : { timeRemaining: number
   }
 
   useEffect(() => {
-    readItemFromStorage()
     fetchExercises()
   }, [])
 
@@ -56,32 +45,14 @@ export default function ExerciseFeed({ timeRemaining } : { timeRemaining: number
     }
   }, [allExercises])
 
-  const completedJson = completeValue ? JSON.parse(completeValue) : null
-
-  const onClick = () => {
-    if (completedJson && completedJson.time === currentTime) {
-      writeItemToStorage('')
-    }
-
-    if (!completeValue) {
-      writeItemToStorage(JSON.stringify({
-        time: currentTime,
-        completed: true,
-      }))
-    }
-
-    if (completedJson && completedJson.time !== currentTime) {
-      writeItemToStorage(JSON.stringify({
-        time: currentTime,
-        completed: true,
-      }))
-    }
-  }
+  useEffect(() => {
+    if (timerDone) setCompleted(true)
+  }, [timerDone])
 
   return (
     <SafeAreaView
       style={{
-        backgroundColor: completedJson && completedJson.time === currentTime ? '#3b82f6' : 'transparent',
+        backgroundColor: completed ? '#3b82f6' : 'transparent',
         height: "100%",
         alignItems: "center",
         justifyContent: "center",
@@ -91,31 +62,35 @@ export default function ExerciseFeed({ timeRemaining } : { timeRemaining: number
       <View>
         {picked && (
           <>
-            <View>
-              <Text
-                style={{
-                  color: '#0f172a',
-                  fontSize: 95,
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                }}
-              >
-                {picked.reps}
-              </Text>
-            </View>
-            {picked.exercise.seconds && (
+            {picked.exercise.seconds ? (
+              <>
+                <Timer time={picked.reps} setOnDone={setTimerDone} disabled={completed} />
+                <View>
+                  <Text
+                    style={{
+                      color: '#0f172a',
+                      fontSize: 15,
+                      fontWeight: '500',
+                      marginBottom: 10,
+                      marginTop: -10,
+                      textAlign: 'center'
+                    }}
+                  >
+                    {'second'}
+                  </Text>
+                </View>
+              </>
+            ) : (
               <View>
                 <Text
                   style={{
                     color: '#0f172a',
-                    fontSize: 15,
-                    fontWeight: '500',
-                    marginBottom: 10,
-                    marginTop: -10,
-                    textAlign: 'center'
+                    fontSize: 95,
+                    fontWeight: 'bold',
+                    textAlign: 'center',
                   }}
                 >
-                  {'second'}
+                  {picked.reps}
                 </Text>
               </View>
             )}
@@ -147,10 +122,7 @@ export default function ExerciseFeed({ timeRemaining } : { timeRemaining: number
                 </Text>
               </View>
             )}
-            {/* <Button
-              title={completedJson && completedJson.time === currentTime ? 'Not complete' : 'Complete'}
-              onPress={onClick}
-            /> */}
+            <CompleteButton />
           </>
         )}
       </View>

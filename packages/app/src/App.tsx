@@ -6,6 +6,7 @@ import {
   View,
 } from "react-native"
 import { UserContextProvider, useUser } from './components/UserContext'
+import { CompletedContextProvider } from './components/CompletedContext'
 import Auth from './components/Auth'
 import ExerciseFeed from './components/ExerciseFeed'
 import { subPlatform } from "./config"
@@ -65,29 +66,31 @@ export function App(): JSX.Element {
 
   return (
     <UserContextProvider>
-      <SafeAreaView
-        style={{
-          backgroundColor: 'white',
-          height: "100%",
-        }}
-      >
+      <CompletedContextProvider>
         <SafeAreaView
           style={{
-            backgroundColor: `rgba(239, 68, 68, ${redOpacity})`,
+            backgroundColor: 'white',
             height: "100%",
           }}
         >
           <SafeAreaView
             style={{
-              backgroundColor: `rgba(34, 197, 94, ${greenOpacity})`,
+              backgroundColor: `rgba(239, 68, 68, ${redOpacity})`,
               height: "100%",
             }}
           >
-            {/* <Container /> */}
-            <ExerciseFeed timeRemaining={timeRemaining} />
+            <SafeAreaView
+              style={{
+                backgroundColor: `rgba(34, 197, 94, ${greenOpacity})`,
+                height: "100%",
+              }}
+            >
+              {/* <Container /> */}
+              <ExerciseFeed timeRemaining={timeRemaining} />
+            </SafeAreaView>
           </SafeAreaView>
         </SafeAreaView>
-      </SafeAreaView>
+      </CompletedContextProvider>
     </UserContextProvider>
   )
 }
