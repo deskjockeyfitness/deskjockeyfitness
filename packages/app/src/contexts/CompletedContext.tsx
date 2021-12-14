@@ -7,6 +7,7 @@ import React, {
 } from 'react'
 import { useAsyncStorage } from '@react-native-async-storage/async-storage'
 import { dateTotal } from '../utils/generateExercise'
+import { TimeContext } from './TimeContext'
 
 type Data = {
   completed: boolean
@@ -29,6 +30,8 @@ export const CompletedContextProvider = (props: any): JSX.Element => {
   const [completed, setCompleted] = useState(false)
   const { getItem, setItem } = useAsyncStorage('@deskjockeyfitness/complete')
 
+  const { secRemaining } = useContext(TimeContext)
+
   const currentTime = dateTotal()
 
   const readItemFromStorage = async () => {
@@ -47,16 +50,25 @@ export const CompletedContextProvider = (props: any): JSX.Element => {
     await setItem(JSON.stringify(newValue))
   }
 
+  // Initial try to find item in storage
   useEffect(() => {
     readItemFromStorage()
   }, [])
 
+  // Write to storage when completed changes
   useEffect(() => {
     writeItemToStorage({
       time:currentTime,
       completed,
     })
   }, [completed])
+
+  // Set completed to false every hour, on the hour
+  useEffect(() => {
+    if (completed && (secRemaining === 0 || secRemaining === 3600)) {
+      setCompleted(false)
+    }
+  }, [secRemaining])
 
   const value = {
     time: currentTime,

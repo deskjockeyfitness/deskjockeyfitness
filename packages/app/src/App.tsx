@@ -1,15 +1,11 @@
-import React, { useEffect, useState } from "react"
-import {
-  Button,
-  Platform,
-  SafeAreaView,
-  View,
-} from "react-native"
-import { UserContextProvider, useUser } from './components/UserContext'
-import { CompletedContextProvider } from './components/CompletedContext'
+import React from 'react'
+import { Button, View } from 'react-native'
+import { UserContextProvider, useUser } from './contexts/UserContext'
+import { CompletedContextProvider } from './contexts/CompletedContext'
+import { TimeContextProvider } from './contexts/TimeContext'
+import BackgroundLayout from './layouts/BackgroundLayout'
 import Auth from './components/Auth'
 import ExerciseFeed from './components/ExerciseFeed'
-import { subPlatform } from "./config"
 import { supabase } from './lib/initSupabase'
 
 const Container = () => {
@@ -25,72 +21,16 @@ const Container = () => {
 }
 
 export function App(): JSX.Element {
-  const [timeRemaining, setTimeRemaining] = useState<number>()
-  const [secondsLeft, setSecondsLeft] = useState<number | undefined>(60)
-  const [greenOpacity, setGreenOpacity] = useState<number>()
-  const [redOpacity, setRedOpacity] = useState<number>()
-
-  const platformValue = subPlatform
-    ? `${Platform.OS} (${subPlatform})`
-    : Platform.OS
-
-  console.log(platformValue)
-
-  useEffect(() => {
-    if (!timeRemaining) {
-      setTimesAndColors()
-    } else {
-      setTimeout(function () {
-        setSecondsLeft(undefined)
-        setTimesAndColors()
-      }, secondsLeft || 60000)
-    }
-  }, [timeRemaining])
-
-  function setTimesAndColors() {
-    const date = new Date()
-    const minute = date.getMinutes()
-    const seconds = date.getSeconds()
-
-    if (seconds) {
-      setSecondsLeft((60 - seconds) * 1000)
-    }
-
-    setTimeRemaining(60 - minute)
-
-    const opacityTime = (60 - minute) / 60
-
-    setGreenOpacity(0 +  opacityTime)
-    setRedOpacity(1 - opacityTime)
-  }
-
   return (
     <UserContextProvider>
-      <CompletedContextProvider>
-        <SafeAreaView
-          style={{
-            backgroundColor: 'white',
-            height: "100%",
-          }}
-        >
-          <SafeAreaView
-            style={{
-              backgroundColor: `rgba(239, 68, 68, ${redOpacity})`,
-              height: "100%",
-            }}
-          >
-            <SafeAreaView
-              style={{
-                backgroundColor: `rgba(34, 197, 94, ${greenOpacity})`,
-                height: "100%",
-              }}
-            >
-              {/* <Container /> */}
-              <ExerciseFeed timeRemaining={timeRemaining} />
-            </SafeAreaView>
-          </SafeAreaView>
-        </SafeAreaView>
-      </CompletedContextProvider>
+      <TimeContextProvider>
+        <CompletedContextProvider>
+          <BackgroundLayout>
+            {/* <Container /> */}
+            <ExerciseFeed />
+          </BackgroundLayout>
+        </CompletedContextProvider>
+      </TimeContextProvider>
     </UserContextProvider>
   )
 }

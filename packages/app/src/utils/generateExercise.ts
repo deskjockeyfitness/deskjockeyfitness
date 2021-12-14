@@ -7,7 +7,11 @@ import {
 export function generateExercise(exercises: Exercise[], date: CompareDate = undefined): ExerciseData | undefined {
   const seed = dateTotal(date)
 
-  const filteredExercises = removeNewerExercises(exercises, date)
+  const newExercises = [...exercises]
+
+  newExercises.sort((a,b) => (a.id > b.id) ? 1 : ((b.id > a.id) ? -1 : 0))
+
+  const filteredExercises = removeNewerExercises(newExercises, date)
 
   if ( !filteredExercises?.length ) return undefined
 
@@ -25,7 +29,7 @@ export function generateExercise(exercises: Exercise[], date: CompareDate = unde
     }
   }
 
-  const reps = shuffle(availableReps, seed)[0]
+  const reps: number = shuffle(availableReps, seed)[0]
 
   return {
     reps,
@@ -55,6 +59,7 @@ function removeNewerExercises(exercises: Exercise[], date: CompareDate = undefin
   })
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function shuffle(array: any[], seed: number) {
   let m = array.length, t, i
 

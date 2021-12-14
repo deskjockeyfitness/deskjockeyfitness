@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Alert, View, Button, TextInput } from 'react-native'
 import { supabase } from '../lib/initSupabase'
 
-export default function Auth() {
+export default function Auth(): JSX.Element {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState('')

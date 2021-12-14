@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import { View, Text } from 'react-native'
 
+type TimerProps = {
+  time: number
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  setOnDone?: Function
+  disabled?: boolean
+}
+
 // eslint-disable-next-line @typescript-eslint/ban-types
-const Timer = ({ time, setOnDone, disabled = false } : { time: number, setOnDone?: Function, disabled?: boolean}): JSX.Element => {
+const Timer = ({ time, setOnDone, disabled = false }: TimerProps): JSX.Element => {
   const [currentTime, setCurrentTime] = useState<number>(time)
   const [started, setStarted] = useState(false)
 
   useEffect(() => {
-    setTimeout(function() {
+    const timer = setTimeout(function() {
       if (started && currentTime > 0) {
         setCurrentTime(currentTime - 1)
       }
@@ -17,6 +24,10 @@ const Timer = ({ time, setOnDone, disabled = false } : { time: number, setOnDone
       if (setOnDone) setOnDone(true)
       setStarted(false)
       setCurrentTime(time)
+    }
+
+    return () => {
+      clearTimeout(timer)
     }
   }, [currentTime, started])
 

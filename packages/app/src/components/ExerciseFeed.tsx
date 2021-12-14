@@ -2,7 +2,8 @@ import React, { useEffect, useState, useContext } from 'react'
 import { View, Text, SafeAreaView } from 'react-native'
 import { supabase } from '../lib/initSupabase'
 import { generateExercise } from '../utils/generateExercise'
-import { CompletedContext } from './CompletedContext'
+import { CompletedContext } from '../contexts/CompletedContext'
+import { TimeContext } from '../contexts/TimeContext'
 import Timer from './Timer'
 import CompleteButton from './CompleteButton'
 import {
@@ -10,34 +11,31 @@ import {
   ExerciseData,
 } from '../types'
 
-export default function ExerciseFeed({ timeRemaining } : { timeRemaining: number | undefined }): JSX.Element {
+export default function ExerciseFeed(): JSX.Element {
   const [allExercises, setAllExercises] = useState<Array<Exercise>>()
   const [picked, setPicked] = useState<ExerciseData>()
   const [timerDone, setTimerDone] = useState(false)
 
   const { completed, setCompleted } = useContext(CompletedContext)
 
-  const fetchExercises = async () => {
-    const { data: exercises, error } = await supabase
-      .from<Exercise>('exercises')
-      .select('*')
-      .order('id', { ascending: false })
+  const { secRemaining } = useContext(TimeContext)
 
-    if (error) console.log('error', error)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    else setAllExercises(exercises!)
-  }
-
+  // Get all exercises from db
   useEffect(() => {
-    fetchExercises()
+    async function fetchData() {
+      const { data: exercises, error } = await supabase
+        .from<Exercise>('exercises')
+        .select('*')
+  
+      if (error) console.log('error', error)
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      else if (exercises && exercises.length) setAllExercises(exercises)
+    }
+
+    fetchData()
   }, [])
 
-  useEffect(() => {
-    if (timeRemaining === 60) {
-      fetchExercises()
-    }
-  }, [timeRemaining])
-
+  // Pick an exercise when all are fetched
   useEffect(() => {
     if (allExercises?.length) {
       const exercise = generateExercise(allExercises)
@@ -45,6 +43,26 @@ export default function ExerciseFeed({ timeRemaining } : { timeRemaining: number
     }
   }, [allExercises])
 
+  // Set next exercise every hour, on the hour
+  useEffect(() => {
+    if (secRemaining <= 0 || secRemaining >= 3600) {
+      if (allExercises?.length) {
+        const exercise = generateExercise(allExercises)
+        setPicked(exercise)
+      }
+    }
+  }, [secRemaining])
+
+  useEffect(() => {
+    if (secRemaining % 3 === 0) {
+      if (allExercises?.length) {
+        const exercise = generateExercise(allExercises)
+        setPicked(exercise)
+      }
+    }
+  }, [secRemaining])
+
+  // Set as completed when timer runs out
   useEffect(() => {
     if (timerDone) setCompleted(true)
   }, [timerDone])
@@ -57,10 +75,15 @@ export default function ExerciseFeed({ timeRemaining } : { timeRemaining: number
         alignItems: "center",
         justifyContent: "center",
         padding: 15,
+        width: '100%',
       }}
     >
-      <View>
-        {picked && (
+      <View
+        style={{
+          width: '100%',
+        }}
+      >
+        {picked ? (
           <>
             {picked.exercise.seconds ? (
               <>
@@ -115,6 +138,7 @@ export default function ExerciseFeed({ timeRemaining } : { timeRemaining: number
                     fontSize: 15,
                     fontWeight: '500',
                     marginBottom: 20,
+                    marginTop: -10,
                     textAlign: 'center'
                   }}
                 >
@@ -124,6 +148,20 @@ export default function ExerciseFeed({ timeRemaining } : { timeRemaining: number
             )}
             <CompleteButton />
           </>
+        ) : (
+          <View>
+            <Text
+              style={{
+                color: '#0f172a',
+                fontSize: 25,
+                fontWeight: '500',
+                marginBottom: 20,
+                textAlign: 'center'
+              }}
+            >
+              Loading next exercise...
+            </Text>
+          </View>
         )}
       </View>
     </SafeAreaView>

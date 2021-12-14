@@ -1,8 +1,8 @@
 import React, { useContext } from 'react'
-import { Button } from 'react-native'
-import { CompletedContext } from './CompletedContext'
+import { Pressable, Text, View } from 'react-native'
+import { CompletedContext } from '../contexts/CompletedContext'
 
-const CompleteButton = () => {
+const CompleteButton = (): JSX.Element => {
   const { completed, setCompleted } = useContext(CompletedContext)
 
   const onPress = () => {
@@ -10,10 +10,35 @@ const CompleteButton = () => {
   }
 
   return (
-    <Button
-      title={completed ? 'Not completed' : 'Completed'}
-      onPress={onPress}
-    />
+    <View
+      style={{
+        alignItems: "center",
+        justifyContent: "center",
+        width: '100%',
+      }}
+    >
+      <Pressable
+        onPress={onPress}
+        style={{
+          backgroundColor: completed ? '#1e293b' : '#3b82f6',
+          borderRadius: 5,
+          paddingLeft: 12,
+          paddingRight: 12,
+          paddingTop: 8,
+          paddingBottom: 8,
+        }}
+      >
+        <Text
+          style={{
+            color: '#fff',
+            fontSize: 15,
+            fontWeight: '600',
+          }}
+        >
+          {completed ? 'Redo' : 'Done'}
+        </Text>
+      </Pressable>
+    </View>
   )
 }
 
