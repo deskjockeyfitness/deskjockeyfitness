@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text } from 'react-native'
+import { View, Text, Pressable } from 'react-native'
 
 type TimerProps = {
   time: number
@@ -36,18 +36,24 @@ const Timer = ({ time, setOnDone, disabled = false }: TimerProps): JSX.Element =
   }
 
   return (
-    <View>
-      <Text
-        onPress={onPress}
-        style={{
-          color: '#0f172a',
-          fontSize: 95,
-          fontWeight: 'bold',
-          textAlign: 'center',
-        }}
-      >
-        {currentTime}
-      </Text>
+    <View
+      style={{
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Pressable onPress={onPress}>
+        <Text
+          style={{
+            color: '#0f172a',
+            fontSize: 95,
+            fontWeight: 'bold',
+            textAlign: 'center',
+          }}
+        >
+          {currentTime}
+        </Text>
+      </Pressable>
     </View>
   )  
 }
